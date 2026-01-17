@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TUNIHACK // THE SEVEN LOCKED LAYERS</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Courier New', monospace;
+}
+
+body{
+    background:#0a0a12;
+    color:#e0e0ff;
+    min-height:100vh;
+    overflow-x:hidden;
+}
+
+.cyber-bg{
+    position:fixed;
+    inset:0;
+    z-index:-1;
+    opacity:0.4;
+}
+
+.grid-lines{
+    width:100%;
+    height:100%;
+    background-image:
+        linear-gradient(to right,rgba(255,0,100,0.1) 1px,transparent 1px),
+        linear-gradient(to bottom,rgba(255,0,100,0.1) 1px,transparent 1px);
+    background-size:50px 50px;
+}
+
+.container{
+    max-width:1000px;
+    margin:auto;
+    padding:40px 20px;
+}
+
+.header{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    border-bottom:1px solid rgba(255,0,100,0.3);
+    padding-bottom:20px;
+}
+
+.logo-image{
+    width:60px;
+    height:60px;
+    border:2px solid rgba(255,0,100,0.5);
+    border-radius:8px;
+    overflow:hidden;
+}
+
+.logo-image img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    padding:5px;
+}
+
+.logo-text{
+    font-size:1.8rem;
+    font-weight:bold;
+    background:linear-gradient(90deg,#ff0066,#00ccff);
+    -webkit-background-clip:text;
+    color:transparent;
+    letter-spacing:2px;
+}
+
+.scenario-content{
+    background:rgba(10,15,30,0.85);
+    border:2px solid rgba(255,0,100,0.5);
+    border-radius:10px;
+    padding:45px;
+    margin-top:40px;
+    box-shadow:0 0 40px rgba(255,0,100,0.25);
+}
+
+/* 🔥 GLITCH TITLE */
+.glitch{
+    position:relative;
+    color:#ff0066;
+    font-size:2.6rem;
+    text-align:center;
+    margin-bottom:35px;
+    animation:glitch 1.5s infinite;
+}
+
+.glitch::before,
+.glitch::after{
+    content:attr(data-text);
+    position:absolute;
+    left:0;
+    top:0;
+    width:100%;
+}
+
+.glitch::before{
+    color:#00ccff;
+    clip-path:inset(0 0 55% 0);
+    animation:glitchTop 1s infinite linear;
+}
+
+.glitch::after{
+    color:#ff4444;
+    clip-path:inset(55% 0 0 0);
+    animation:glitchBottom 1s infinite linear;
+}
+
+@keyframes glitch{
+    20%{transform:skew(-1deg)}
+    40%{transform:skew(1deg)}
+}
+
+@keyframes glitchTop{
+    50%{transform:translate(-3px,-2px)}
+}
+
+@keyframes glitchBottom{
+    50%{transform:translate(3px,2px)}
+}
+
+/* 🧠 STORY TEXT ANIMATION */
+.story p{
+    font-size:1.2rem;
+    line-height:1.9;
+    color:#ccccff;
+    margin-bottom:20px;
+    opacity:0;
+    animation:fadeIn 1s forwards;
+}
+
+.story p:nth-child(1){animation-delay:0.3s}
+.story p:nth-child(2){animation-delay:0.8s}
+.story p:nth-child(3){animation-delay:1.3s}
+.story p:nth-child(4){animation-delay:1.8s}
+.story p:nth-child(5){animation-delay:2.3s}
+.story p:nth-child(6){animation-delay:2.8s}
+.story p:nth-child(7){animation-delay:3.3s}
+
+@keyframes fadeIn{
+    to{opacity:1}
+}
+
+.highlight{color:#00ccff;font-weight:bold}
+.danger{color:#ff4444;font-weight:bold}
+
+/* 👁️ LOCKED LAYERS (STATIC) */
+.layer{
+    margin:15px 0;
+    padding:18px;
+    text-align:center;
+    letter-spacing:2px;
+    border:2px solid #ff4444;
+    background:rgba(50,0,0,0.6);
+    color:#ff4444;
+    box-shadow:inset 0 0 10px rgba(255,0,0,0.3);
+}
+
+/* 🚀 BUTTON */
+.start-container{
+    text-align:center;
+    margin-top:45px;
+}
+
+.start-btn{
+    background:linear-gradient(90deg,#ff0066,#9900ff);
+    border:none;
+    color:white;
+    padding:20px 55px;
+    font-size:1.4rem;
+    font-weight:bold;
+    border-radius:8px;
+    cursor:pointer;
+    letter-spacing:2px;
+}
+
+.start-btn:hover{
+    box-shadow:0 0 40px rgba(255,0,100,0.7);
+    transform:translateY(-3px);
+}
+
+.footer{
+    text-align:center;
+    margin-top:50px;
+    color:#8888cc;
+    font-size:0.9rem;
+}
+
+@keyframes flashRed{
+    50%{background:#330000}
+}
+</style>
+</head>
+
+<body>
+
+<div class="cyber-bg"><div class="grid-lines"></div></div>
+
+<div class="container">
+
+<header class="header">
+    <div class="logo-image">
+        <img src="Logo_Ossec_2_Finale.png" alt="OSSEC">
+    </div>
+    <div class="logo-text">TUNIHACK CTF</div>
+</header>
+
+<div class="scenario-content">
+
+<h1 class="glitch" data-text="⚠️ THE SEVEN LOCKED LAYERS ⚠️">
+⚠️ THE SEVEN LOCKED LAYERS ⚠️
+</h1>
+
+<div class="story">
+<p>The system was never meant to be opened.</p>
+
+<p>Hidden beneath the servers lies <span class="highlight">The Core</span>, sealed behind 
+<span class="danger">seven digital layers</span>.</p>
+
+<p>Each layer is a locked door.  
+Each door demands a <span class="danger">flag</span>.</p>
+
+<p>Open a door without understanding it, and the maze pushes back.  
+Clues lie. Paths loop. Mistakes follow you.</p>
+
+<p>The deeper you go, the quieter it becomes.  
+No hints. No mercy. Just you and the code.</p>
+
+<p>Some say teams never make it past Layer 5.  
+Some say the system starts watching after Layer 3.</p>
+
+<p><span class="danger">Find the flags.</span>  
+Unlock the doors.  
+Reach the Core.</p>
+
+<p>Or stay trapped in the maze.</p>
+
+<p class="danger">Welcome to the Playground 🔒</p>
+</div>
+
+<!-- 👁️ STATIC LOCKED LAYERS -->
+<div class="layer">LAYER 1 — LOCKED</div>
+<div class="layer">LAYER 2 — LOCKED</div>
+<div class="layer">LAYER 3 — LOCKED</div>
+<div class="layer">LAYER 4 — LOCKED</div>
+<div class="layer">LAYER 5 — LOCKED</div>
+<div class="layer">LAYER 6 — LOCKED</div>
+<div class="layer">LAYER 7 — LOCKED</div>
+
+<div class="start-container">
+    <button class="start-btn" onclick="enterMaze()">ENTER THE MAZE</button>
+</div>
+
+</div>
+
+<footer class="footer">
+OSSEC CLUB // TUNIHACK // ACCESS LOGGED
+</footer>
+
+</div>
+
+<!-- 🎵 MUSIC -->
+<audio id="music" autoplay loop muted>
+    <source src="Revenge - Super Slowed.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+/* 🔐 VERIFICATION */
+function checkVerification(){
+    if(sessionStorage.getItem('tunihack_verified')==='true') return true;
+    if(localStorage.getItem('tunihack_verified')==='true') return true;
+
+    alert('⚠️ ACCESS DENIED');
+    document.body.style.animation='flashRed .5s 3';
+    setTimeout(()=>location.href='register.html',1500);
+    return false;
+}
+
+/* 🎵 MUSIC AUTOPLAY FIX */
+const music=document.getElementById('music');
+music.volume=0.25;
+
+function enableSound(){
+    music.muted=false;
+    music.play().catch(()=>{});
+    document.removeEventListener('click',enableSound);
+    document.removeEventListener('keydown',enableSound);
+}
+document.addEventListener('click',enableSound);
+document.addEventListener('keydown',enableSound);
+
+/* 🚀 ENTER MAZE */
+function enterMaze(){
+    document.body.style.animation='flashRed .5s 3';
+    setTimeout(()=>location.href='signup.html',2000);
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+    if(!checkVerification()) return;
+});
+</script>
+
+</body>
+</html>
+/html>

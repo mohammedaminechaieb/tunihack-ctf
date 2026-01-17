@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CyberGame CTF – Maze of Challenges</title>
+<style>
+/* Enhanced Cyberpunk Theme */
+:root {
+  --primary: #ff0066;
+  --primary-dark: #cc0052;
+  --secondary: #00ff88;
+  --secondary-dark: #00cc6c;
+  --bg-dark: #0a0a12;
+  --bg-card: rgba(20, 20, 40, 0.95);
+  --text: #e0e0ff;
+  --text-light: #a0a0ff;
+  --accent: #6c63ff;
+  --accent-glow: rgba(108, 99, 255, 0.4);
+  --danger: #ff4d4d;
+  --warning: #ffcc00;
+  --success: #00ff88;
+  --locked: #33334d;
+  --border-radius: 12px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  --neon-glow: 0 0 10px currentColor, 0 0 20px currentColor;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg-dark);
+  color: var(--text);
+  font-family: 'Segoe UI', 'Courier New', monospace;
+  min-height: 100vh;
+  padding: 20px;
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(108, 99, 255, 0.1) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(255, 0, 102, 0.1) 0%, transparent 40%);
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(90deg, transparent 50%, rgba(255, 255, 255, 0.02) 50%),
+    linear-gradient(transparent 50%, rgba(255, 255, 255, 0.02) 50%);
+  background-size: 30px 30px;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.3;
+}
+
+.header-container {
+  text-align: center;
+  margin-bottom: 40px;
+  position: relative;
+  padding: 20px;
+}
+
+h1 {
+  color: var(--primary);
+  font-size: 2.8rem;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  text-shadow: 0 0 10px rgba(255, 0, 102, 0.7);
+  position: relative;
+  display: inline-block;
+}
+
+h1::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 25%;
+  width: 50%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+}
+
+.subtitle {
+  color: var(--text-light);
+  font-size: 1.1rem;
+  margin-bottom: 30px;
+  letter-spacing: 1px;
+}
+
+.leaderboard-btn {
+  background: linear-gradient(135deg, var(--accent), #8a84ff);
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  font-size: 1.1rem;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-weight: bold;
+  letter-spacing: 1px;
+  transition: var(--transition);
+  box-shadow: var(--box-shadow), 0 0 15px var(--accent-glow);
+  margin-bottom: 20px;
+}
+
+.leaderboard-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 35px rgba(108, 99, 255, 0.6), 0 0 25px var(--accent-glow);
+}
+
+.leaderboard-btn:active {
+  transform: translateY(0);
+}
+
+.username-display {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 8px 20px;
+  border-radius: 50px;
+  margin-left: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.9rem;
+}
+
+.username-display span {
+  color: var(--secondary);
+  font-weight: bold;
+}
+
+/* Maze Grid - Enhanced */
+.maze-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.maze-title {
+  text-align: center;
+  color: var(--text-light);
+  margin-bottom: 30px;
+  font-size: 1.5rem;
+}
+
+#maze {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+  margin-bottom: 40px;
+}
+
+.gate {
+  background: var(--bg-card);
+  border: 2px solid;
+  padding: 25px;
+  text-align: center;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--box-shadow);
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.gate::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, var(--primary), var(--accent), var(--secondary), var(--accent), var(--primary));
+  z-index: -1;
+  border-radius: var(--border-radius);
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+.gate:hover::before {
+  opacity: 0.7;
+}
+
+.gate h3 {
+  font-size: 1.8rem;
+  margin-bottom: 8px;
+  color: var(--text);
+  z-index: 1;
+}
+
+.gate small {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--text-light);
+  margin-bottom: 15px;
+  z-index: 1;
+  padding: 5px 15px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+}
+
+.gate.locked {
+  border-color: var(--locked);
+  cursor: not-allowed;
+  position: relative;
+  opacity: 0.7;
+}
+
+.gate.locked::after {
+  content: '🔒';
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 1.5rem;
+}
+
+.gate.completed {
+  border-color: var(--secondary);
+  box-shadow: 0 0 25px rgba(0, 255, 136, 0.5);
+}
+
+.gate.completed::before {
+  opacity: 0.5;
+}
+
+.gate.completed::after {
+  content: '✅';
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 1.5rem;
+}
+
+.gate.active {
+  border-color: var(--primary);
+  box-shadow: 0 0 25px rgba(255, 0, 102, 0.7);
+}
+
+/* Special styling for Gate 7 */
+.gate.final-gate {
+  border-color: var(--warning);
+  position: relative;
+}
+
+.gate.final-gate::before {
+  background: linear-gradient(45deg, var(--warning), var(--primary), var(--accent), var(--warning));
+}
+
+.gate.final-gate h3::after {
+  content: ' 👑';
+  font-size: 1.2rem;
+}
+
+/* Challenge Box - Enhanced */
+#challengeBox {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 35px;
+  border: 2px solid var(--primary);
+  border-radius: var(--border-radius);
+  background: var(--bg-card);
+  display: none;
+  box-shadow: var(--box-shadow), 0 0 30px rgba(255, 0, 102, 0.3);
+  animation: fadeIn 0.5s ease-out;
+  position: relative;
+  overflow: hidden;
+}
+
+#challengeBox::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(90deg, var(--primary), var(--accent), var(--secondary));
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+#challengeBox h2 {
+  color: var(--primary);
+  margin-bottom: 15px;
+  font-size: 2rem;
+  text-shadow: 0 0 8px rgba(255, 0, 102, 0.5);
+}
+
+#challengeBox p {
+  color: var(--text);
+  line-height: 1.6;
+  margin-bottom: 25px;
+  font-size: 1.1rem;
+}
+
+.resource-link {
+  display: inline-flex;
+  align-items: center;
+  background: linear-gradient(135deg, var(--accent), #8a84ff);
+  color: white;
+  text-decoration: none;
+  padding: 12px 25px;
+  border-radius: var(--border-radius);
+  margin-bottom: 25px;
+  font-weight: bold;
+  transition: var(--transition);
+  box-shadow: 0 5px 15px rgba(108, 99, 255, 0.3);
+}
+
+.resource-link:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(108, 99, 255, 0.5);
+}
+
+.resource-link::before {
+  content: '📁';
+  margin-right: 10px;
+  font-size: 1.2rem;
+}
+
+/* Enhanced Input and Buttons */
+.input-group {
+  margin-top: 25px;
+}
+
+#flagInput {
+  width: 100%;
+  padding: 18px 20px;
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--secondary);
+  border: 2px solid rgba(0, 255, 136, 0.5);
+  border-radius: var(--border-radius);
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+  transition: var(--transition);
+  margin-bottom: 20px;
+}
+
+#flagInput:focus {
+  outline: none;
+  border-color: var(--secondary);
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+}
+
+#flagInput::placeholder {
+  color: rgba(0, 255, 136, 0.5);
+}
+
+.button-group {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.ctf-button {
+  padding: 16px 32px;
+  font-size: 1.1rem;
+  border-radius: var(--border-radius);
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  letter-spacing: 1px;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 180px;
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  box-shadow: 0 8px 25px rgba(255, 0, 102, 0.4);
+  flex-grow: 1;
+}
+
+.submit-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(255, 0, 102, 0.6);
+}
+
+.submit-btn:active {
+  transform: translateY(0);
+}
+
+.back-btn {
+  background: linear-gradient(135deg, #444, #222);
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.back-btn:hover {
+  background: linear-gradient(135deg, #555, #333);
+  transform: translateY(-3px);
+}
+
+/* Progress Indicator */
+.progress-container {
+  max-width: 1400px;
+  margin: 30px auto;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 20px;
+  border-radius: var(--border-radius);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.progress-title {
+  color: var(--text-light);
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+}
+
+.progress-bar {
+  height: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 6px;
+  transition: width 0.5s ease;
+}
+
+.progress-text {
+  text-align: center;
+  color: var(--text-light);
+  font-size: 0.9rem;
+}
+
+.progress-text strong {
+  color: var(--secondary);
+}
+
+/* Gate Requirements Info */
+.gate-requirements {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  right: 10px;
+  font-size: 0.7rem;
+  color: var(--text-light);
+  opacity: 0.8;
+  text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  #maze {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  #maze {
+    grid-template-columns: 1fr;
+  }
+  
+  h1 {
+    font-size: 2rem;
+  }
+  
+  .header-container {
+    padding: 10px;
+  }
+  
+  .button-group {
+    flex-direction: column;
+  }
+  
+  .ctf-button {
+    width: 100%;
+  }
+}
+
+/* Gate Status Indicators */
+.gate-status {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--locked);
+}
+
+.gate.completed .gate-status {
+  background: var(--secondary);
+  box-shadow: 0 0 10px var(--secondary);
+}
+
+.gate.active .gate-status {
+  background: var(--primary);
+  box-shadow: 0 0 10px var(--primary);
+}
+
+/* Instructions Panel */
+.instructions {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  border-radius: var(--border-radius);
+  margin-bottom: 30px;
+  border-left: 5px solid var(--accent);
+}
+
+.instructions h3 {
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+
+.instructions p {
+  color: var(--text-light);
+  line-height: 1.5;
+}
+
+/* Animation for gate unlocking */
+@keyframes unlockPulse {
+  0% { box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.7); }
+  70% { box-shadow: 0 0 0 15px rgba(0, 255, 136, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 255, 136, 0); }
+}
+
+.gate.unlocking {
+  animation: unlockPulse 1.5s ease;
+}
+
+/* Special unlock animation for Gate 7 */
+@keyframes finalUnlock {
+  0% { box-shadow: 0 0 0 0 rgba(255, 204, 0, 0.7); }
+  70% { box-shadow: 0 0 0 20px rgba(255, 204, 0, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 204, 0, 0); }
+}
+
+.gate.final-gate.unlocking {
+  animation: finalUnlock 2s ease;
+}
+</style>
+</head>
+<body>
+
+<div class="header-container">
+  <h1>CyberGame CTF – Maze of Challenges</h1>
+  <p class="subtitle">Navigate through 7 security gates. Complete each challenge to progress.</p>
+  
+  <button class="leaderboard-btn" onclick="location.href='leaderboard.html'">
+    🏆 View Leaderboard
+  </button>
+  
+  <div class="username-display">
+    Player: <span id="currentUsername">Loading...</span>
+  </div>
+</div>
+
+<div class="instructions">
+  <h3>How to Play:</h3>
+  <p>1. Start with Gate 1 (it's the only one unlocked initially).</p>
+  <p>2. Solve the challenge and submit the correct flag.</p>
+  <p>3. Once Gate 1 is solved, <strong>gates 2-6 will unlock</strong> and you can complete them in any order.</p>
+  <p>4. <strong>Gate 7 (Final Gate) unlocks only when gates 1-6 are all completed.</strong></p>
+  <p>5. Complete all 7 gates to master the maze!</p>
+</div>
+
+<div class="maze-container">
+  <h2 class="maze-title">Security Gates</h2>
+  
+  <div class="progress-container">
+    <div class="progress-title">Your Progress</div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+    </div>
+    <div class="progress-text">
+      <strong><span id="completedCount">0</span> / 7</strong> gates completed
+    </div>
+  </div>
+
+  <!-- Maze grid -->
+  <div id="maze"></div>
+</div>
+
+<!-- Challenge box -->
+<div id="challengeBox"></div>
+
+<script>
+const API = "/api";
+
+const maze = document.getElementById("maze");
+const challengeBox = document.getElementById("challengeBox");
+
+// Must be signed up first
+const username = localStorage.getItem("username");
+if (!username) {
+  alert("Please signup first");
+  window.location.href = "signup.html";
+}
+
+// Update username display
+document.getElementById("currentUsername").textContent = username || "Guest";
+
+let challenges = [];
+let completedGates = [];
+let activeGateId = null;
+
+// ---------------- LOAD DATA ----------------
+async function loadMaze() {
+  try {
+    const chRes = await fetch(`${API}/challenges`);
+    challenges = await chRes.json();
+
+    const stRes = await fetch(`${API}/gates-status/${username}`);
+    const states = await stRes.json();
+    completedGates = states.map(s => s.gateId);
+
+    updateProgress();
+    renderMaze();
+  } catch(err) {
+    console.error("Error loading maze:", err);
+    maze.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; background:rgba(255,0,0,0.1); border-radius:var(--border-radius); border:1px solid var(--danger);">
+      <h3 style="color:var(--danger);">Connection Error</h3>
+      <p>Cannot load challenges. Is the backend running?</p>
+      <button onclick="location.reload()" style="margin-top:20px; padding:10px 20px; background:var(--primary); color:white; border:none; border-radius:var(--border-radius); cursor:pointer;">Retry</button>
+    </div>`;
+  }
+}
+
+// ---------------- UPDATE PROGRESS ----------------
+function updateProgress() {
+  const completedCount = completedGates.length;
+  const progressPercent = (completedCount / 7) * 100;
+  
+  document.getElementById('progressFill').style.width = `${progressPercent}%`;
+  document.getElementById('completedCount').textContent = completedCount;
+}
+
+// Check if all gates 1-6 are completed
+function areGates1to6Completed() {
+  for (let i = 1; i <= 6; i++) {
+    if (!completedGates.includes(i)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+// ---------------- RENDER MAZE ----------------
+function renderMaze() {
+  maze.innerHTML = "";
+
+  // Show all 7 gates
+  for (let i = 0; i < 7; i++) {
+    const gateId = i + 1;
+    const ch = challenges[i] || { 
+      name: `Challenge ${gateId}`, 
+      category: "unknown", 
+      description: "Challenge details not available yet.", 
+      resource_url: "#" 
+    };
+
+    const div = document.createElement("div");
+    div.className = "gate";
+    
+    // Add special class for Gate 7
+    if (gateId === 7) {
+      div.classList.add("final-gate");
+    }
+    
+    // Mark if this gate is currently active
+    if (gateId === activeGateId) {
+      div.classList.add("active");
+    }
+    
+    // Mark if completed
+    if (completedGates.includes(gateId)) {
+      div.classList.add("completed");
+    }
+    
+    // Determine if gate is locked
+    let isLocked = false;
+    let lockReason = "";
+    
+    if (gateId === 1) {
+      // Gate 1 is always unlocked
+      isLocked = false;
+    } else if (gateId === 7) {
+      // Gate 7 unlocks only when gates 1-6 are all completed
+      const gates1to6Completed = areGates1to6Completed();
+      isLocked = !gates1to6Completed && !completedGates.includes(7);
+      if (isLocked) {
+        const completedCount = completedGates.filter(g => g <= 6).length;
+        lockReason = `Complete ${6 - completedCount} more gates to unlock`;
+      }
+    } else {
+      // Gates 2-6 unlock when Gate 1 is completed
+      const gate1Completed = completedGates.includes(1);
+      isLocked = !gate1Completed && !completedGates.includes(gateId);
+      if (isLocked) {
+        lockReason = "Complete Gate 1 to unlock";
+      }
+    }
+    
+    if (isLocked) {
+      div.classList.add("locked");
+    }
+
+    div.innerHTML = `
+      <h3>Gate ${gateId}${gateId === 7 ? ' (Final)' : ''}</h3>
+      <small>${ch.category}</small>
+      <div class="gate-status"></div>
+      ${completedGates.includes(gateId) ? '<div style="margin-top:10px; color:var(--secondary); font-size:0.9rem;">✅ Completed</div>' : ''}
+      ${isLocked && lockReason ? `<div class="gate-requirements">${lockReason}</div>` : ''}
+    `;
+    
+    // Only add click handler if not locked
+    if (!isLocked) {
+      div.onclick = () => openGate(gateId, ch);
+    }
+    
+    maze.appendChild(div);
+  }
+}
+
+// ---------------- OPEN GATE ----------------
+function openGate(gateId, ch) {
+  activeGateId = gateId;
+  challengeBox.style.display = "block";
+  
+  // Special message for Gate 7
+  const specialMessage = gateId === 7 ? 
+    '<div style="background: rgba(255, 204, 0, 0.1); padding: 15px; border-radius: var(--border-radius); border-left: 4px solid var(--warning); margin-bottom: 20px;">' +
+    '🏆 <strong>Final Challenge:</strong> This is the ultimate test! Solve this to complete the maze.' +
+    '</div>' : '';
+  
+  challengeBox.innerHTML = `
+    <h2>${ch.name}${gateId === 7 ? ' 🏆' : ''}</h2>
+    ${specialMessage}
+    <p>${ch.description}</p>
+    <a href="${ch.resource_url}" target="_blank" class="resource-link">Download Challenge Files</a>
+    
+    <div class="input-group">
+      <input id="flagInput" placeholder="Enter flag in format: TUNIHACK{...}" autocomplete="off">
+    </div>
+    
+    <div class="button-group">
+      <button class="ctf-button submit-btn" onclick="submitFlag(${gateId})">
+        🚀 Submit Flag
+      </button>
+      <button class="ctf-button back-btn" onclick="closeChallenge()">
+        ↩ Back to Maze
+      </button>
+    </div>
+  `;
+  
+  // Focus the input field
+  setTimeout(() => {
+    const flagInput = document.getElementById("flagInput");
+    if (flagInput) flagInput.focus();
+  }, 100);
+  
+  // Re-render maze to show active gate
+  renderMaze();
+}
+
+// ---------------- CLOSE CHALLENGE ----------------
+function closeChallenge() {
+  challengeBox.style.display = "none";
+  activeGateId = null;
+  renderMaze();
+}
+
+// ---------------- SUBMIT FLAG ----------------
+async function submitFlag(gateId) {
+  const flagInput = document.getElementById("flagInput");
+  const flag = flagInput.value.trim();
+  
+  if (!flag) {
+    alert("Please enter a flag");
+    flagInput.focus();
+    return;
+  }
+
+  // Show loading state
+  const submitBtn = document.querySelector('.submit-btn');
+  const originalText = submitBtn.innerHTML;
+  submitBtn.innerHTML = '⏳ Checking...';
+  submitBtn.disabled = true;
+
+  try {
+    const res = await fetch(`${API}/submit-flag`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: username, gateId, flag })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      // Show success animation
+      submitBtn.innerHTML = '✅ Correct!';
+      submitBtn.style.background = 'linear-gradient(135deg, var(--secondary), var(--secondary-dark))';
+      
+      // Add to completed gates if not already there
+      if (!completedGates.includes(gateId)) {
+        completedGates.push(gateId);
+        
+        // Animate the gate completion
+        const gateElement = Array.from(document.querySelectorAll('.gate')).find(el => {
+          const gateText = el.querySelector('h3').textContent;
+          return gateText.includes(`Gate ${gateId}`);
+        });
+        
+        if (gateElement) {
+          gateElement.classList.add('unlocking');
+          setTimeout(() => gateElement.classList.remove('unlocking'), gateId === 7 ? 2000 : 1500);
+        }
+      }
+      
+      // Update progress
+      updateProgress();
+      
+      // Close challenge box after delay
+      setTimeout(() => {
+        challengeBox.style.display = "none";
+        activeGateId = null;
+        renderMaze();
+        
+        // Show celebration for completing all gates
+        if (completedGates.length === 7) {
+          setTimeout(() => {
+            alert("🎉 CONGRATULATIONS! You've completed ALL 7 gates and mastered the maze! You are a true CTF champion! 🏆");
+          }, 500);
+        } else if (gateId === 7) {
+          setTimeout(() => {
+            alert("🎉 Amazing! You've completed the Final Gate! Check your progress above.");
+          }, 500);
+        } else if (areGates1to6Completed()) {
+          setTimeout(() => {
+            alert("✨ Excellent! You've completed gates 1-6! Gate 7 (Final Gate) is now unlocked! Go for the ultimate challenge!");
+          }, 500);
+        }
+      }, gateId === 7 ? 2000 : 1500);
+    } else {
+      // Show error
+      submitBtn.innerHTML = '❌ Wrong Flag';
+      submitBtn.style.background = 'linear-gradient(135deg, var(--danger), #cc0000)';
+      
+      // Reset button after delay
+      setTimeout(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.style.background = 'linear-gradient(135deg, var(--primary), var(--primary-dark))';
+        submitBtn.disabled = false;
+      }, 1500);
+    }
+  } catch(err) {
+    console.error("Error submitting flag:", err);
+    alert("Network error. Please check your connection.");
+    
+    // Reset button
+    submitBtn.innerHTML = originalText;
+    submitBtn.disabled = false;
+  }
+}
+
+// ---------------- START ----------------
+loadMaze();
+
+// Add keyboard shortcuts
+document.addEventListener('keydown', function(event) {
+  // ESC to close challenge box
+  if (event.key === 'Escape' && challengeBox.style.display === 'block') {
+    closeChallenge();
+  }
+  
+  // Enter to submit flag when input is focused
+  if (event.key === 'Enter' && challengeBox.style.display === 'block' && 
+      document.activeElement && document.activeElement.id === 'flagInput') {
+    const submitBtn = document.querySelector('.submit-btn');
+    if (submitBtn && !submitBtn.disabled) {
+      submitFlag(activeGateId);
+    }
+  }
+});
+</script>
+</body>
+</html>

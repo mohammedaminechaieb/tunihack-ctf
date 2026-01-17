@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CyberGame CTF // Waiting Room</title>
+<style>
+/* Cyberpunk Theme */
+:root {
+  --primary: #ff0066;
+  --primary-dark: #cc0052;
+  --secondary: #00ff88;
+  --secondary-dark: #00cc6c;
+  --bg-dark: #0a0a12;
+  --bg-card: rgba(20, 20, 40, 0.95);
+  --text: #e0e0ff;
+  --text-light: #a0a0ff;
+  --accent: #6c63ff;
+  --accent-glow: rgba(108, 99, 255, 0.4);
+  --border-radius: 12px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  --neon-glow: 0 0 10px currentColor, 0 0 20px currentColor;
+}
+
+* { 
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg-dark);
+  color: var(--text);
+  font-family: 'Segoe UI', 'Courier New', monospace;
+  min-height: 100vh;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* Animated background */
+.background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+}
+
+.grid-lines {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(90deg, transparent 50%, rgba(255, 255, 255, 0.02) 50%),
+    linear-gradient(transparent 50%, rgba(255, 255, 255, 0.02) 50%);
+  background-size: 50px 50px;
+  animation: gridMove 20s linear infinite;
+}
+
+@keyframes gridMove {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(50px, 50px); }
+}
+
+.particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: var(--primary);
+  border-radius: 50%;
+  animation: float 15s infinite linear;
+}
+
+@keyframes float {
+  0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(-100px) translateX(100px); opacity: 0; }
+}
+
+/* Main container */
+.container {
+  background: var(--bg-card);
+  padding: 50px 40px;
+  border: 2px solid var(--primary);
+  border-radius: var(--border-radius);
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+  box-shadow: var(--box-shadow), 0 0 40px rgba(255, 0, 102, 0.3);
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  margin: 20px;
+  backdrop-filter: blur(10px);
+  animation: containerGlow 4s ease-in-out infinite alternate;
+}
+
+@keyframes containerGlow {
+  0% { box-shadow: var(--box-shadow), 0 0 40px rgba(255, 0, 102, 0.3); }
+  100% { box-shadow: var(--box-shadow), 0 0 60px rgba(255, 0, 102, 0.5); }
+}
+
+.container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(90deg, var(--primary), var(--accent), var(--secondary));
+  z-index: 2;
+}
+
+.container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  animation: shimmer 3s infinite;
+  z-index: 0;
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Header */
+.header {
+  margin-bottom: 40px;
+  position: relative;
+  z-index: 1;
+}
+
+h1 {
+  color: var(--primary);
+  font-size: 3rem;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  text-shadow: 0 0 15px rgba(255, 0, 102, 0.7);
+  position: relative;
+  display: inline-block;
+  animation: titlePulse 3s ease-in-out infinite;
+}
+
+@keyframes titlePulse {
+  0%, 100% { transform: scale(1); text-shadow: 0 0 15px rgba(255, 0, 102, 0.7); }
+  50% { transform: scale(1.02); text-shadow: 0 0 25px rgba(255, 0, 102, 0.9); }
+}
+
+h1::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 25%;
+  width: 50%;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+}
+
+.subtitle {
+  color: var(--text-light);
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+  opacity: 0.9;
+  margin-bottom: 20px;
+}
+
+/* Status indicator */
+.status-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 30px;
+  z-index: 1;
+  position: relative;
+}
+
+.status-indicator {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--secondary);
+  animation: pulse 1.5s infinite;
+  box-shadow: 0 0 10px var(--secondary);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.1); }
+}
+
+.status-text {
+  color: var(--secondary);
+  font-weight: bold;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* Welcome message */
+.welcome-box {
+  background: rgba(108, 99, 255, 0.1);
+  border-radius: var(--border-radius);
+  padding: 25px;
+  margin-bottom: 30px;
+  text-align: left;
+  border-left: 3px solid var(--accent);
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  animation: slideIn 1s ease-out;
+}
+
+@keyframes slideIn {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.welcome-title {
+  color: var(--accent);
+  font-size: 1.3rem;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.welcome-title::before {
+  content: '⏳';
+  font-size: 1.5rem;
+}
+
+.welcome-text {
+  color: var(--text-light);
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.welcome-text strong {
+  color: var(--secondary);
+}
+
+/* Countdown */
+.countdown-container {
+  background: rgba(255, 0, 102, 0.1);
+  border-radius: var(--border-radius);
+  padding: 20px;
+  margin-bottom: 30px;
+  animation: fadeIn 1s ease-out 0.5s both;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.countdown-title {
+  color: var(--primary);
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.countdown-timer {
+  font-size: 3.5rem;
+  font-weight: bold;
+  color: var(--text);
+  font-family: 'Courier New', monospace;
+  margin-bottom: 10px;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  animation: timerGlow 2s infinite alternate;
+}
+
+@keyframes timerGlow {
+  0% { text-shadow: 0 0 10px rgba(255, 255, 255, 0.3); }
+  100% { text-shadow: 0 0 20px rgba(255, 0, 102, 0.5); }
+}
+
+.countdown-label {
+  color: var(--text-light);
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+}
+
+/* Code entry */
+.code-container {
+  margin-bottom: 30px;
+  animation: slideUp 1s ease-out 0.8s both;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.code-title {
+  color: var(--text-light);
+  margin-bottom: 15px;
+  text-align: center;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.code-input-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.code-digit {
+  width: 50px;
+  height: 70px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  font-size: 2.5rem;
+  font-weight: bold;
+  text-align: center;
+  color: var(--secondary);
+  font-family: 'Courier New', monospace;
+  transition: var(--transition);
+  outline: none;
+  text-transform: uppercase;
+}
+
+.code-digit:focus {
+  border-color: var(--secondary);
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+  transform: translateY(-5px);
+}
+
+.code-digit.filled {
+  border-color: var(--primary);
+  background: rgba(255, 0, 102, 0.1);
+  animation: digitPop 0.2s ease-out;
+}
+
+@keyframes digitPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.code-hint {
+  color: var(--text-light);
+  font-size: 0.85rem;
+  opacity: 0.7;
+  margin-top: 10px;
+}
+
+/* Submit button */
+.submit-btn {
+  width: 100%;
+  padding: 20px;
+  background: linear-gradient(135deg, var(--accent), #8a84ff);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 1.2rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: var(--transition);
+  text-transform: uppercase;
+  margin-top: 10px;
+  box-shadow: 0 8px 25px rgba(108, 99, 255, 0.4);
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  animation: buttonGlow 3s infinite alternate;
+}
+
+@keyframes buttonGlow {
+  0% { box-shadow: 0 8px 25px rgba(108, 99, 255, 0.4); }
+  100% { box-shadow: 0 8px 30px rgba(108, 99, 255, 0.7); }
+}
+
+.submit-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(108, 99, 255, 0.7);
+}
+
+.submit-btn:active {
+  transform: translateY(0);
+}
+
+.submit-btn::after {
+  content: '🔓';
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.5rem;
+}
+
+/* Error message */
+.error {
+  color: #ff4444;
+  margin-top: 20px;
+  padding: 15px;
+  background: rgba(255, 68, 68, 0.1);
+  border-radius: var(--border-radius);
+  border: 1px solid rgba(255, 68, 68, 0.3);
+  display: none;
+  text-align: center;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  animation: shake 0.5s ease-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.error-icon {
+  display: inline-block;
+  margin-right: 10px;
+  font-size: 1.2rem;
+}
+
+/* Success animation */
+.success-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 10, 18, 0.95);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s, visibility 0.5s;
+}
+
+.success-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.success-box {
+  background: var(--bg-card);
+  padding: 50px;
+  border-radius: var(--border-radius);
+  text-align: center;
+  max-width: 500px;
+  border: 2px solid var(--secondary);
+  box-shadow: 0 0 50px rgba(0, 255, 136, 0.5);
+  animation: successPulse 2s infinite;
+}
+
+@keyframes successPulse {
+  0%, 100% { box-shadow: 0 0 50px rgba(0, 255, 136, 0.5); }
+  50% { box-shadow: 0 0 70px rgba(0, 255, 136, 0.8); }
+}
+
+.success-icon {
+  font-size: 5rem;
+  margin-bottom: 20px;
+  animation: spin 1s ease-out;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg) scale(0); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+.success-title {
+  color: var(--secondary);
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+}
+
+.success-text {
+  color: var(--text-light);
+  font-size: 1.1rem;
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+/* Footer */
+.footer {
+  margin-top: 30px;
+  color: var(--text-light);
+  font-size: 0.85rem;
+  opacity: 0.7;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 20px;
+  z-index: 1;
+  position: relative;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .container {
+    padding: 30px 20px;
+    margin: 20px;
+    max-width: 95%;
+  }
+  
+  h1 {
+    font-size: 2.2rem;
+  }
+  
+  .countdown-timer {
+    font-size: 2.8rem;
+  }
+  
+  .code-digit {
+    width: 40px;
+    height: 60px;
+    font-size: 2rem;
+  }
+  
+  .submit-btn {
+    padding: 18px;
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .code-input-container {
+    gap: 5px;
+  }
+  
+  .code-digit {
+    width: 35px;
+    height: 50px;
+    font-size: 1.8rem;
+  }
+  
+  .countdown-timer {
+    font-size: 2.2rem;
+  }
+}
+</style>
+</head>
+
+<body>
+<!-- Animated Background -->
+<div class="background">
+  <div class="grid-lines"></div>
+  <div class="particles" id="particles"></div>
+</div>
+
+<!-- Main Container -->
+<div class="container">
+  <div class="header">
+    <h1>CTF WAITING ROOM</h1>
+    <p class="subtitle">Awaiting authorization to enter the CyberMaze</p>
+  </div>
+
+  <div class="status-container">
+    <div class="status-indicator"></div>
+    <div class="status-text">SYSTEM STANDBY</div>
+  </div>
+
+  <div class="welcome-box">
+    <div class="welcome-title">OPERATIVE IDENTIFIED</div>
+    <div class="welcome-text">
+      Welcome, <strong id="usernameDisplay">AGENT</strong>. Your credentials have been verified.
+      <br><br>
+      The CyberMaze is currently <strong>LOCKED</strong>. All teams must wait for the administrator's signal before proceeding.
+      <br><br>
+      Once the access code is broadcast, enter it below to begin your mission.
+    </div>
+  </div>
+
+  <div class="countdown-container">
+    <div class="countdown-title">COMPETITION STARTS IN</div>
+    <div class="countdown-timer" id="countdownTimer">--:--:--</div>
+    <div class="countdown-label">Awaiting start signal from command</div>
+  </div>
+
+  <div class="code-container">
+    <div class="code-title">ENTER ACCESS CODE</div>
+    <div class="code-input-container">
+      <input type="text" maxlength="1" class="code-digit" data-index="0">
+      <input type="text" maxlength="1" class="code-digit" data-index="1">
+      <input type="text" maxlength="1" class="code-digit" data-index="2">
+      <input type="text" maxlength="1" class="code-digit" data-index="3">
+      <input type="text" maxlength="1" class="code-digit" data-index="4">
+      <input type="text" maxlength="1" class="code-digit" data-index="5">
+      <input type="text" maxlength="1" class="code-digit" data-index="6">
+      <input type="text" maxlength="1" class="code-digit" data-index="7">
+    </div>
+    <div class="code-hint">Code will be provided by the administrator when the competition begins</div>
+  </div>
+
+  <button class="submit-btn" id="submitBtn">UNLOCK CYBERMAZE</button>
+
+  <div class="error" id="errorMsg">
+    <span class="error-icon">⚠️</span>
+    <span id="errorText">Invalid access code. Please try again.</span>
+  </div>
+
+  <div class="footer">
+    <div>CyberGame CTF - Waiting Protocol Active</div>
+    <div>All operatives must remain in standby until authorization is granted</div>
+  </div>
+</div>
+
+<!-- Success Overlay -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-box">
+    <div class="success-icon">✅</div>
+    <div class="success-title">ACCESS GRANTED</div>
+    <div class="success-text">
+      Authorization confirmed. Redirecting to the CyberMaze...
+      <br><br>
+      <strong>Good luck, operative. The mission begins now.</strong>
+    </div>
+    <div class="countdown-timer" id="redirectTimer">5</div>
+  </div>
+</div>
+
+<script>
+// Get username from localStorage or use default
+const username = localStorage.getItem('username') || 'AGENT';
+document.getElementById('usernameDisplay').textContent = username;
+
+// Create animated particles
+function createParticles() {
+  const particlesContainer = document.getElementById('particles');
+  const particleCount = 50;
+  
+  for (let i = 0; i < particleCount; i++) {
+    const particle = document.createElement('div');
+    particle.classList.add('particle');
+    
+    // Random position
+    const left = Math.random() * 100;
+    const delay = Math.random() * 15;
+    const duration = 10 + Math.random() * 10;
+    const size = 1 + Math.random() * 3;
+    
+    particle.style.left = `${left}%`;
+    particle.style.animationDelay = `${delay}s`;
+    particle.style.animationDuration = `${duration}s`;
+    particle.style.width = `${size}px`;
+    particle.style.height = `${size}px`;
+    
+    // Random color
+    const colors = ['#ff0066', '#00ff88', '#6c63ff', '#ffcc00'];
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    particle.style.backgroundColor = color;
+    
+    particlesContainer.appendChild(particle);
+  }
+}
+
+// Initialize countdown timer (set to a future time for demo)
+function initializeCountdown() {
+  const timerElement = document.getElementById('countdownTimer');
+  
+  // For demo purposes, set countdown to 10 minutes from now
+  const endTime = new Date();
+  endTime.setMinutes(endTime.getMinutes() + 10);
+  
+  function updateTimer() {
+    const now = new Date();
+    const diff = endTime - now;
+    
+    if (diff <= 0) {
+      timerElement.textContent = "00:00:00";
+      return;
+    }
+    
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    
+    timerElement.textContent = 
+      `${hours.toString().padStart(2, '0')}:` +
+      `${minutes.toString().padStart(2, '0')}:` +
+      `${seconds.toString().padStart(2, '0')}`;
+  }
+  
+  updateTimer();
+  setInterval(updateTimer, 1000);
+}
+
+// Code input handling
+const codeDigits = document.querySelectorAll('.code-digit');
+const CORRECT_CODE = '25062003';
+
+codeDigits.forEach((digit, index) => {
+  digit.addEventListener('input', (e) => {
+    const value = e.target.value;
+    
+    // Only allow numbers
+    if (!/^\d*$/.test(value)) {
+      e.target.value = '';
+      return;
+    }
+    
+    // If a digit is entered, move to next
+    if (value.length === 1 && index < codeDigits.length - 1) {
+      codeDigits[index + 1].focus();
+    }
+    
+    // Add filled class for animation
+    if (value.length === 1) {
+      e.target.classList.add('filled');
+    } else {
+      e.target.classList.remove('filled');
+    }
+  });
+  
+  digit.addEventListener('keydown', (e) => {
+    // Handle backspace - move to previous input
+    if (e.key === 'Backspace' && digit.value === '' && index > 0) {
+      codeDigits[index - 1].focus();
+    }
+    
+    // Handle arrow keys for navigation
+    if (e.key === 'ArrowLeft' && index > 0) {
+      codeDigits[index - 1].focus();
+    }
+    
+    if (e.key === 'ArrowRight' && index < codeDigits.length - 1) {
+      codeDigits[index + 1].focus();
+    }
+  });
+});
+
+// Submit button handler
+document.getElementById('submitBtn').addEventListener('click', validateCode);
+
+function validateCode() {
+  const enteredCode = Array.from(codeDigits)
+    .map(digit => digit.value)
+    .join('');
+  
+  const errorElement = document.getElementById('errorMsg');
+  const submitBtn = document.getElementById('submitBtn');
+  
+  if (enteredCode.length !== 8) {
+    showError("Please enter all 8 digits of the access code");
+    return;
+  }
+  
+  if (enteredCode !== CORRECT_CODE) {
+    showError("Invalid access code. Please try again.");
+    
+    // Shake animation for wrong code
+    codeDigits.forEach(digit => {
+      digit.style.animation = 'none';
+      setTimeout(() => {
+        digit.style.animation = 'shake 0.5s';
+      }, 10);
+    });
+    
+    return;
+  }
+  
+  // Correct code - show success
+  showSuccess();
+}
+
+function showError(message) {
+  const errorElement = document.getElementById('errorMsg');
+  const errorText = document.getElementById('errorText');
+  
+  errorText.textContent = message;
+  errorElement.style.display = 'block';
+  
+  // Hide error after 3 seconds
+  setTimeout(() => {
+    errorElement.style.display = 'none';
+  }, 3000);
+}
+
+function showSuccess() {
+  const successOverlay = document.getElementById('successOverlay');
+  const redirectTimer = document.getElementById('redirectTimer');
+  const submitBtn = document.getElementById('submitBtn');
+  
+  // Disable submit button
+  submitBtn.disabled = true;
+  submitBtn.textContent = "ACCESS GRANTED ✅";
+  submitBtn.style.background = 'linear-gradient(135deg, var(--secondary), var(--secondary-dark))';
+  
+  // Show success overlay
+  successOverlay.classList.add('active');
+  
+  // Countdown for redirect
+  let countdown = 5;
+  redirectTimer.textContent = countdown;
+  
+  const countdownInterval = setInterval(() => {
+    countdown--;
+    redirectTimer.textContent = countdown;
+    
+    if (countdown <= 0) {
+      clearInterval(countdownInterval);
+      // Redirect to maze
+      window.location.href = 'maze.html';
+    }
+  }, 1000);
+}
+
+// Allow Enter key to submit
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    validateCode();
+  }
+});
+
+// Initialize everything when page loads
+document.addEventListener('DOMContentLoaded', () => {
+  // Create particles
+  createParticles();
+  
+  // Initialize countdown
+  initializeCountdown();
+  
+  // Auto-focus first digit
+  setTimeout(() => {
+    codeDigits[0].focus();
+  }, 500);
+});
+</script>
+</body>
+</html>

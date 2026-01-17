@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TUNIHACK // CYBER CHALLENGE</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+        }
+
+        body {
+            background-color: #0a0a12;
+            color: #e0e0ff;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .cyber-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.4;
+        }
+
+        .grid-lines {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(to right, rgba(200, 0, 100, 0.1) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(200, 0, 100, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        .glowing-orbs {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(40px);
+            animation: pulse 8s infinite alternate;
+        }
+
+        .orb:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 0, 100, 0.15);
+            top: 10%;
+            left: 5%;
+            animation-delay: 0s;
+        }
+
+        .orb:nth-child(2) {
+            width: 400px;
+            height: 400px;
+            background: rgba(0, 150, 255, 0.1);
+            bottom: 10%;
+            right: 10%;
+            animation-delay: 2s;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.3; transform: scale(1); }
+            100% { opacity: 0.7; transform: scale(1.2); }
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .club-logo {
+            width: 280px;
+            height: 280px;
+            margin: 20px auto 40px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid rgba(255, 0, 100, 0.3);
+            box-shadow: 0 0 30px rgba(255, 0, 100, 0.3);
+            animation: logoGlow 3s infinite alternate;
+        }
+
+        .club-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 20px;
+            background: rgba(10, 15, 30, 0.8);
+        }
+
+        @keyframes logoGlow {
+            0% { box-shadow: 0 0 20px rgba(255, 0, 100, 0.3); }
+            100% { box-shadow: 0 0 40px rgba(255, 0, 100, 0.6), 0 0 60px rgba(0, 150, 255, 0.3); }
+        }
+
+        .welcome-title {
+            font-size: 3.5rem;
+            font-weight: bold;
+            background: linear-gradient(90deg, #ff0066, #0099ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 30px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            line-height: 1.2;
+        }
+
+        .typewriter-container {
+            max-width: 900px;
+            margin: 0 auto 50px;
+            text-align: center;
+        }
+
+        .typewriter {
+            font-size: 1.5rem;
+            line-height: 1.6;
+            color: #ccccff;
+            min-height: 200px;
+            border: 1px solid rgba(255, 0, 100, 0.3);
+            padding: 30px;
+            border-radius: 5px;
+            background: rgba(10, 15, 30, 0.7);
+            box-shadow: 0 0 20px rgba(255, 0, 100, 0.1);
+            position: relative;
+        }
+
+        .typewriter-text {
+            display: inline;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 1.5rem;
+            background-color: #ff0066;
+            margin-left: 5px;
+            animation: blink 1s infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .warning-box {
+            background: rgba(255, 50, 50, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            padding: 25px;
+            border-radius: 5px;
+            margin: 40px auto;
+            max-width: 900px;
+            box-shadow: 0 0 25px rgba(255, 0, 0, 0.2);
+        }
+
+        .warning-title {
+            color: #ff4444;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .warning-text {
+            color: #ffaaaa;
+            font-size: 1.3rem;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        .start-section {
+            margin: 50px auto;
+            padding: 30px;
+            max-width: 900px;
+        }
+
+        .start-btn {
+            background: linear-gradient(90deg, #ff0066, #9900ff);
+            border: none;
+            color: white;
+            padding: 25px 60px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            margin: 20px 0;
+        }
+
+        .start-btn:hover {
+            box-shadow: 0 0 40px rgba(255, 0, 100, 0.7);
+            transform: translateY(-5px);
+            background: linear-gradient(90deg, #ff3300, #cc00ff);
+        }
+
+        .start-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+            z-index: -1;
+        }
+
+        .start-btn:hover::after {
+            left: 100%;
+        }
+
+        .footer {
+            width: 100%;
+            text-align: center;
+            color: #8888cc;
+            font-size: 1rem;
+            padding: 30px 20px;
+            margin-top: 50px;
+            border-top: 1px solid rgba(255, 0, 100, 0.3);
+        }
+
+        .glitch {
+            position: relative;
+            display: inline-block;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.8;
+        }
+
+        .glitch::before {
+            left: 2px;
+            text-shadow: -2px 0 #00ffff;
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+
+        .glitch::after {
+            left: -2px;
+            text-shadow: -2px 0 #ff00ff;
+            animation: glitch-anim2 3s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% { clip: rect(42px, 9999px, 44px, 0); }
+            100% { clip: rect(4px, 9999px, 91px, 0); }
+        }
+
+        @keyframes glitch-anim2 {
+            0% { clip: rect(65px, 9999px, 100px, 0); }
+            100% { clip: rect(23px, 9999px, 49px, 0); }
+        }
+
+        @keyframes flashRed {
+            0% { background-color: #0a0a12; }
+            50% { background-color: #330000; }
+            100% { background-color: #0a0a12; }
+        }
+
+        @media (max-width: 768px) {
+            .welcome-title { font-size: 2.5rem; }
+            .club-logo { width: 220px; height: 220px; }
+            .typewriter { font-size: 1.2rem; padding: 20px; }
+            .warning-text { font-size: 1.1rem; }
+            .start-btn { padding: 20px 40px; font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="cyber-bg">
+        <div class="grid-lines"></div>
+        <div class="glowing-orbs">
+            <div class="orb"></div>
+            <div class="orb"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="club-logo">
+            <img src="Logo_Ossec_2_Finale.png" alt="OSSEC Club Logo" id="logoImage">
+        </div>
+
+        <h1 class="welcome-title glitch" data-text="WELCOME TO TUNIHACK CYBER CHALLENGE">WELCOME TO TUNIHACK CYBER CHALLENGE</h1>
+        
+        <div class="typewriter-container">
+            <div class="typewriter">
+                <div id="typedText"></div>
+                <span class="cursor"></span>
+            </div>
+        </div>
+
+        <div class="warning-box">
+            <div class="warning-title">
+                <i class="fas fa-skull-crossbones"></i>
+                IMPORTANT NOTICE
+                <i class="fas fa-skull-crossbones"></i>
+            </div>
+            <div class="warning-text">
+                This isn't your grandma's knitting competition. We're not here to hold your hand.<br>
+                The challenges are brutal, the cryptography is savage, and the web exploits will make you cry.
+                <br><br>
+                <strong>You've been warned.</strong>
+            </div>
+        </div>
+
+        <div class="start-section">
+            <div style="color: #00ccff; font-size: 1.2rem; margin-bottom: 20px;">
+                <i class="fas fa-exclamation-circle"></i>
+                READY TO FACE THE CHALLENGE?
+            </div>
+            
+            <button class="start-btn" onclick="startRegistration()">
+                <i class="fas fa-terminal"></i> I ACCEPT THE PAIN. LET'S BEGIN
+            </button>
+            
+            <div style="color: #8888cc; font-size: 0.9rem; margin-top: 20px;">
+                <i class="fas fa-info-circle"></i>
+                Clicking this button means you accept responsibility for any broken keyboards or shattered egos.
+            </div>
+        </div>
+        
+        <footer class="footer">
+            <div>OSSEC CLUB PRESENTS // TUNIHACK CYBER CHALLENGE 2026</div>
+            <div style="margin-top: 10px; font-size: 0.9rem;">
+                <i class="fas fa-exclamation-triangle"></i> NO REFUNDS ON BROWN PANTS OR MENTAL SCARS
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // SIMPLE VERSION - NO LOCALSTORAGE ISSUES
+        const messages = [
+            "YOU THINK YOU'RE READY?",
+            "THINK AGAIN.",
+            "THE COMING HOURS WILL TEST EVERY OUNCE OF YOUR SKILL.",
+            "GOOD LUCK. YOU'LL NEED IT."
+        ];
+
+        let messageIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        let isPaused = false;
+
+        function typeWriter() {
+            const typedTextElement = document.getElementById('typedText');
+            
+            if (isPaused) return;
+            
+            const currentMessage = messages[messageIndex];
+            
+            if (!isDeleting && charIndex <= currentMessage.length) {
+                typedTextElement.textContent = currentMessage.substring(0, charIndex);
+                charIndex++;
+                setTimeout(typeWriter, 50);
+            } else if (isDeleting && charIndex >= 0) {
+                typedTextElement.textContent = currentMessage.substring(0, charIndex);
+                charIndex--;
+                setTimeout(typeWriter, 30);
+            } else {
+                isDeleting = !isDeleting;
+                
+                if (!isDeleting) {
+                    messageIndex = (messageIndex + 1) % messages.length;
+                }
+                
+                isPaused = true;
+                setTimeout(() => {
+                    isPaused = false;
+                    typeWriter();
+                }, 1500);
+            }
+        }
+
+        function startRegistration() {
+            const btn = document.querySelector('.start-btn');
+            btn.innerHTML = '<i class="fas fa-cog fa-spin"></i> INITIATING VERIFICATION...';
+            btn.disabled = true;
+            
+            document.body.style.animation = 'flashRed 0.5s 3';
+            
+            setTimeout(() => {
+                window.location.href = 'register.html';
+            }, 2000);
+        }
+
+        document.getElementById('logoImage').onerror = function() {
+            this.onerror = null;
+            this.style.display = 'none';
+            const logoDiv = document.querySelector('.club-logo');
+            logoDiv.innerHTML = `
+                <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column; color: #ff0066; background: rgba(10, 15, 30, 0.9);">
+                    <i class="fas fa-user-secret" style="font-size: 4rem; margin-bottom: 20px;"></i>
+                    <div style="font-size: 2rem; font-weight: bold;">OSSEC CLUB</div>
+                    <div style="font-size: 1rem; color: #8888cc;">TUNIHACK CTF</div>
+                </div>
+            `;
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            typeWriter();
+        });
+    </script>
+<!-- 🎵 BACKGROUND MUSIC -->
+    <audio id="bgMusic" autoplay loop muted>
+        <source src="Revenge - Super Slowed.mp3" type="audio/mpeg">
+    </audio>
+
+</body>
+</html>
+<script>
+/* ===== MUSIC UNLOCK ===== */
+const bgMusic = document.getElementById('bgMusic');
+bgMusic.volume = 0.25;
+
+function unlockAudio() {
+    bgMusic.muted = false;
+    bgMusic.play().catch(()=>{});
+    document.removeEventListener('click', unlockAudio);
+    document.removeEventListener('keydown', unlockAudio);
+}
+
+document.addEventListener('click', unlockAudio);
+document.addEventListener('keydown', unlockAudio);
+
+/* ===== ENTER KEY SUPPORT ===== */
+document.getElementById('presidentInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        verifyAccess();
+    }
+});
+</script>

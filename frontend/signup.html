@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CyberGame CTF // Agent Registration</title>
+<style>
+/* Cyberpunk Theme - Consistent with other pages */
+:root {
+  --primary: #ff0066;
+  --primary-dark: #cc0052;
+  --secondary: #00ff88;
+  --secondary-dark: #00cc6c;
+  --bg-dark: #0a0a12;
+  --bg-card: rgba(20, 20, 40, 0.95);
+  --text: #e0e0ff;
+  --text-light: #a0a0ff;
+  --accent: #6c63ff;
+  --accent-glow: rgba(108, 99, 255, 0.4);
+  --border-radius: 12px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  --neon-glow: 0 0 10px currentColor, 0 0 20px currentColor;
+}
+
+* { 
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg-dark);
+  color: var(--text);
+  font-family: 'Segoe UI', 'Courier New', monospace;
+  min-height: 100vh;
+  margin: 0;
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(108, 99, 255, 0.1) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(255, 0, 102, 0.1) 0%, transparent 40%);
+  position: relative;
+  /* REMOVED: overflow: hidden; */
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(90deg, transparent 50%, rgba(255, 255, 255, 0.02) 50%),
+    linear-gradient(transparent 50%, rgba(255, 255, 255, 0.02) 50%);
+  background-size: 30px 30px;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.3;
+}
+
+/* Main container - now allows scrolling */
+.container {
+  background: var(--bg-card);
+  padding: 50px;
+  border: 2px solid var(--primary);
+  border-radius: var(--border-radius);
+  width: 100%;
+  max-width: 480px;
+  text-align: center;
+  box-shadow: var(--box-shadow), 0 0 40px rgba(255, 0, 102, 0.3);
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  margin: 40px auto; /* Added margin for spacing */
+}
+
+.container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(90deg, var(--primary), var(--accent), var(--secondary));
+  z-index: 2;
+}
+
+/* Header */
+.header {
+  margin-bottom: 30px;
+  position: relative;
+}
+
+h2 {
+  color: var(--primary);
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  text-shadow: 0 0 10px rgba(255, 0, 102, 0.7);
+}
+
+.subtitle {
+  color: var(--text-light);
+  font-size: 1rem;
+  letter-spacing: 1px;
+  opacity: 0.9;
+}
+
+/* Form styling */
+.form-group {
+  margin-bottom: 25px;
+  text-align: left;
+}
+
+.form-label {
+  display: block;
+  color: var(--text-light);
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Username input */
+.input-wrapper {
+  position: relative;
+}
+
+#username {
+  width: 100%;
+  padding: 18px 20px;
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--secondary);
+  border: 2px solid rgba(0, 255, 136, 0.5);
+  border-radius: var(--border-radius);
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+  transition: var(--transition);
+  font-family: 'Courier New', monospace;
+  outline: none;
+}
+
+#username:focus {
+  border-color: var(--secondary);
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+}
+
+#username::placeholder {
+  color: rgba(0, 255, 136, 0.5);
+  letter-spacing: 1px;
+}
+
+.input-icon {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--secondary);
+  font-size: 1.2rem;
+}
+
+/* Question section */
+.question-section {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--border-radius);
+  padding: 20px;
+  margin-bottom: 25px;
+  border-left: 3px solid var(--accent);
+  text-align: left;
+}
+
+.question-title {
+  color: var(--accent);
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.question-title::before {
+  content: '❓';
+  font-size: 1.2rem;
+}
+
+.question-text {
+  color: var(--text-light);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Category selection */
+.category-section {
+  margin-bottom: 30px;
+}
+
+.category-title {
+  color: var(--text-light);
+  margin-bottom: 15px;
+  text-align: left;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.category-card {
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--border-radius);
+  padding: 20px;
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.category-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--accent);
+  box-shadow: 0 10px 20px rgba(108, 99, 255, 0.2);
+}
+
+.category-card.selected {
+  border-color: var(--primary);
+  background: rgba(255, 0, 102, 0.1);
+  box-shadow: 0 0 20px rgba(255, 0, 102, 0.3);
+}
+
+.category-card.selected::before {
+  content: '✓';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: var(--primary);
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.category-icon {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.category-name {
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.category-desc {
+  font-size: 0.85rem;
+  color: var(--text-light);
+  line-height: 1.4;
+}
+
+/* Special icons for each category */
+.category-card[data-cat="web"] .category-icon { color: #ff0066; }
+.category-card[data-cat="crypto"] .category-icon { color: #00ff88; }
+.category-card[data-cat="reverse"] .category-icon { color: #6c63ff; }
+.category-card[data-cat="forensics"] .category-icon { color: #ffcc00; }
+
+/* Submit button */
+.signup-btn {
+  width: 100%;
+  padding: 20px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 1.2rem;
+  font-weight: bold;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: var(--transition);
+  text-transform: uppercase;
+  margin-top: 10px;
+  box-shadow: 0 8px 25px rgba(255, 0, 102, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.signup-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(255, 0, 102, 0.6);
+}
+
+.signup-btn:active {
+  transform: translateY(0);
+}
+
+.signup-btn::after {
+  content: '🚀';
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.5rem;
+}
+
+/* Error message */
+.error {
+  color: #ff4444;
+  margin-top: 20px;
+  padding: 15px;
+  background: rgba(255, 68, 68, 0.1);
+  border-radius: var(--border-radius);
+  border: 1px solid rgba(255, 68, 68, 0.3);
+  display: none;
+  text-align: left;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.error-icon {
+  display: inline-block;
+  margin-right: 10px;
+  font-size: 1.2rem;
+}
+
+/* Footer */
+.footer {
+  margin-top: 30px;
+  color: var(--text-light);
+  font-size: 0.85rem;
+  opacity: 0.7;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 20px;
+}
+
+/* Difficulty selector (visual only) */
+.difficulty-visual {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.difficulty-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.difficulty-dot.active {
+  background: var(--secondary);
+  box-shadow: 0 0 10px var(--secondary);
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+  .container {
+    padding: 30px 20px;
+    margin: 20px;
+    max-width: 95%;
+  }
+  
+  h2 {
+    font-size: 2rem;
+  }
+  
+  .category-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .signup-btn {
+    padding: 18px;
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-height: 800px) {
+  .container {
+    margin: 20px auto;
+  }
+}
+
+/* Animation for signup */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.signup-processing {
+  animation: pulse 1s infinite;
+}
+
+/* Remove the particles container since it was causing overflow issues */
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <div class="header">
+    <h2>OPERATIVE REGISTRATION</h2>
+    <p class="subtitle">Create your cyber identity to enter the maze</p>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">HACKER CALLSIGN</label>
+    <div class="input-wrapper">
+      <input id="username" placeholder="ENTER 3-20 CHARACTERS" autocomplete="off" />
+      <div class="input-icon">👤</div>
+    </div>
+  </div>
+
+  <div class="question-section">
+    <div class="question-title">SELECT YOUR SPECIALIZATION</div>
+    <div class="question-text">
+      Choose your strongest category. This will help us tailor your initial challenges.
+      Don't worry - you'll still have access to all challenge types in the maze!
+    </div>
+  </div>
+
+  <div class="category-section">
+    <div class="category-title">PRIMARY SKILL CATEGORY</div>
+    <div class="category-grid">
+      <div class="category-card selected" data-cat="web">
+        <div class="category-icon">🌐</div>
+        <div class="category-name">WEB EXPLOITATION</div>
+        <div class="category-desc">SQLi, XSS, CSRF, API hacking</div>
+      </div>
+      <div class="category-card" data-cat="crypto">
+        <div class="category-icon">🔐</div>
+        <div class="category-name">CRYPTOGRAPHY</div>
+        <div class="category-desc">Ciphers, RSA, AES, hashes</div>
+      </div>
+      <div class="category-card" data-cat="reverse">
+        <div class="category-icon">⚙️</div>
+        <div class="category-name">REVERSE ENGINEERING</div>
+        <div class="category-desc">Assembly, decompilation, debugging</div>
+      </div>
+      <div class="category-card" data-cat="forensics">
+        <div class="category-icon">🔍</div>
+        <div class="category-name">DIGITAL FORENSICS</div>
+        <div class="category-desc">Memory analysis, file recovery, steganography</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="signup-btn" id="signupBtn">GENERATE CYBER IDENTITY</button>
+
+  <div class="error" id="errorMsg">
+    <span class="error-icon">⚠️</span>
+    <span id="errorText"></span>
+  </div>
+
+  <div class="footer">
+    By registering, you agree to the CyberGame CTF Terms of Engagement.
+  </div>
+</div>
+
+<script>
+let selectedCategory = 'web';
+
+// Category selection
+document.querySelectorAll('.category-card').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.category-card')
+      .forEach(d => d.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedCategory = el.dataset.cat;
+  });
+});
+
+document.getElementById('signupBtn').addEventListener('click', signup);
+
+async function signup() {
+  const username = document.getElementById('username').value.trim().toUpperCase();
+  const error = document.getElementById('errorMsg');
+  const errorText = document.getElementById('errorText');
+  const btn = document.getElementById('signupBtn');
+
+  error.style.display = 'none';
+
+  if (username.length < 3 || username.length > 20) {
+    errorText.textContent = 'CALLSIGN MUST BE BETWEEN 3 AND 20 CHARACTERS';
+    error.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = 'PROCESSING...';
+
+  try {
+    const res = await fetch('/api/signup', {   // ✅ FIXED HERE
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username,
+        category: selectedCategory,
+        difficulty: 2
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      localStorage.setItem('username', username);
+      window.location.href = 'wait.html';
+    } else {
+      errorText.textContent = data.message || 'SIGNUP FAILED';
+      error.style.display = 'block';
+      btn.disabled = false;
+      btn.innerHTML = 'GENERATE CYBER IDENTITY';
+    }
+
+  } catch (err) {
+    errorText.textContent = 'SERVER UNREACHABLE';
+    error.style.display = 'block';
+    btn.disabled = false;
+    btn.innerHTML = 'GENERATE CYBER IDENTITY';
+  }
+}
+</script>
+
+</body>
+</html>
